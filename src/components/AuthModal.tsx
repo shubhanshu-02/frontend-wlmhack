@@ -1,22 +1,26 @@
-import React, { useState } from 'react';
-import { X, User, Mail, Lock, UserPlus } from 'lucide-react';
-import { useAuth } from '../context/AuthContext';
+import React, { useState } from "react";
+import { X, User, Mail, Lock, UserPlus } from "lucide-react";
+import { useAuth } from "../context/AuthContext";
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialMode?: 'login' | 'register';
+  initialMode?: "login" | "register";
 }
 
-const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'login' }) => {
-  const [mode, setMode] = useState<'login' | 'register'>(initialMode);
+const AuthModal: React.FC<AuthModalProps> = ({
+  isOpen,
+  onClose,
+  initialMode = "login",
+}) => {
+  const [mode, setMode] = useState<"login" | "register">(initialMode);
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: '',
-    role: 'customer'
+    name: "",
+    email: "",
+    password: "",
+    role: "customer",
   });
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
   const { login, register } = useAuth();
@@ -25,27 +29,37 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
+    setError("");
     setIsLoading(true);
 
     try {
-      if (mode === 'login') {
+      if (mode === "login") {
         await login(formData.email, formData.password);
       } else {
-        await register(formData.name, formData.email, formData.password, formData.role);
+        await register(
+          formData.name,
+          formData.email,
+          formData.password,
+          formData.role
+        );
       }
       onClose();
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'An error occurred');
+    } catch (err: unknown) {
+      setError(
+        (err as { response?: { data?: { message?: string } } })?.response?.data
+          ?.message || "An error occurred"
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData(prev => ({
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    setFormData((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -54,7 +68,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
       <div className="bg-white rounded-lg shadow-xl w-full max-w-md mx-4">
         <div className="flex items-center justify-between p-6 border-b">
           <h2 className="text-xl font-bold text-gray-900">
-            {mode === 'login' ? 'Sign In' : 'Create Account'}
+            {mode === "login" ? "Sign In" : "Create Account"}
           </h2>
           <button
             onClick={onClose}
@@ -71,7 +85,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
             </div>
           )}
 
-          {mode === 'register' && (
+          {mode === "register" && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Full Name
@@ -127,7 +141,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
             </div>
           </div>
 
-          {mode === 'register' && (
+          {mode === "register" && (
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Account Type
@@ -140,7 +154,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
               >
                 <option value="customer">Customer</option>
                 <option value="partner">Business Partner</option>
+                <option value="admin">Administrator</option>
               </select>
+              <p className="text-xs text-gray-500 mt-1">
+                {formData.role === "customer" &&
+                  "Browse and purchase returned items"}
+                {formData.role === "partner" &&
+                  "Manage inventory and process orders"}
+                {formData.role === "admin" &&
+                  "Full system administration access"}
+              </p>
             </div>
           )}
 
@@ -153,8 +176,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
               <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-white"></div>
             ) : (
               <>
-                {mode === 'login' ? <User className="h-5 w-5" /> : <UserPlus className="h-5 w-5" />}
-                <span>{mode === 'login' ? 'Sign In' : 'Create Account'}</span>
+                {mode === "login" ? (
+                  <User className="h-5 w-5" />
+                ) : (
+                  <UserPlus className="h-5 w-5" />
+                )}
+                <span>{mode === "login" ? "Sign In" : "Create Account"}</span>
               </>
             )}
           </button>
@@ -162,13 +189,12 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, initialMode = 'l
           <div className="text-center">
             <button
               type="button"
-              onClick={() => setMode(mode === 'login' ? 'register' : 'login')}
+              onClick={() => setMode(mode === "login" ? "register" : "login")}
               className="text-blue-600 hover:text-blue-700 font-medium"
             >
-              {mode === 'login' 
-                ? "Don't have an account? Sign up" 
-                : "Already have an account? Sign in"
-              }
+              {mode === "login"
+                ? "Don't have an account? Sign up"
+                : "Already have an account? Sign in"}
             </button>
           </div>
         </form>
